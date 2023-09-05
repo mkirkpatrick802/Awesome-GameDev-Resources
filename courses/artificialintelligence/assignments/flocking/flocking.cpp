@@ -1,6 +1,7 @@
-#include <iostream>
-#include <vector>
 #include <iomanip>
+#include <iostream>
+#include <cmath>
+#include <vector>
 
 struct Vector2D
 {
@@ -37,6 +38,13 @@ struct Vector2D
     return Vector2D(x + rhs.x, y + rhs.y);
   }
 
+  [[nodiscard]] Vector2D normalize() const
+  {
+    double mag = sqrt(x * x + y * y);
+    if (mag == 0) return Vector2D(x,y);
+    return Vector2D(x / mag,y / mag);
+  }
+
   double x;
   double y;
 };
@@ -63,15 +71,14 @@ public:
     calculateNeighbors(radius, agents, numOfAgents, false);
 
     Vector2D center;
-    for (auto i = neighborhood.begin(); i < neighborhood.end(); ++i)
+    for (auto i = m_neighborhood.begin(); i < m_neighborhood.end(); ++i)
     {
-      center.x += i->getPos().x;
-      center.y += i->getPos().y;
+      center += i->getPos();
     }
 
     Vector2D force;
     force = center - m_position;
-    m_cohesionForce = force * constant;
+    m_cohesionForce = force.normalize() * constant;
   }
 
   void calculateSeparation(double constant, double maxForce, double radius, Agent agents[], int numOfAgents)
@@ -79,15 +86,12 @@ public:
     calculateNeighbors(radius, agents, numOfAgents, false);
 
     Vector2D force;
-    for (auto i = neighborhood.begin(); i < neighborhood.end(); ++i)
+    for (auto i = m_neighborhood.begin(); i < m_neighborhood.end(); ++i)
     {
-      force.x += m_position.x - i->getPos().x;
-      force.y += m_position.y - i->getPos().y;
+      force += m_position - i->getPos();
     }
 
-    if(force.x > maxForce) force.x = maxForce;
-    if(force.y > maxForce) force.y = maxForce;
-    m_separationForce = force * constant;
+    m_separationForce = force.normalize() * constant;
   }
 
   void calculateAlignment(double constant, double radius, Agent agents[], int numOfAgents)
@@ -95,12 +99,12 @@ public:
     calculateNeighbors(radius, agents, numOfAgents, true);
 
     Vector2D averageVelocity;
-    for (auto i = neighborhood.begin(); i < neighborhood.end(); ++i)
+    for (auto i = m_neighborhood.begin(); i < m_neighborhood.end(); ++i)
     {
       averageVelocity += i->getVel();
     }
 
-    averageVelocity = averageVelocity / neighborhood.size();
+    averageVelocity = averageVelocity / m_neighborhood.size();
     m_alignmentForce = averageVelocity * constant;
   }
 
@@ -117,7 +121,7 @@ public:
 private:
   void calculateNeighbors(double radius, Agent agents[], int numOfAgents, bool includeSelf)
   {
-    neighborhood.clear();
+    m_neighborhood.clear();
 
     for (int i = 0; i < numOfAgents; i++)
     {
@@ -128,37 +132,36 @@ private:
       if(agentPos.x > m_position.x + radius || agentPos.x < m_position.x - radius) continue;
       if(agentPos.y > m_position.y + radius || agentPos.y < m_position.y - radius) continue;
 
-      neighborhood.push_back(agents[i]);
+      m_neighborhood.push_back(agents[i]);
     }
   }
 
   Vector2D m_position, m_velocity;
   Vector2D m_cohesionForce, m_separationForce, m_alignmentForce;
-  std::vector<Agent> neighborhood;
+  std::vector<Agent> m_neighborhood;
 };
 
 int main()
 {
-  bool quit = false;
-
   double c_radius,s_radius, a_radius;
   double c_constant, s_constant, a_constant;
   double maxForce;
   double deltaTime;
   int numOfAgents;
 
+  //Collect Sim Info
   std::cin >> c_radius >> s_radius >> maxForce >> a_radius >> c_constant >> s_constant >> a_constant >> numOfAgents;
 
+  //Collect Agent Info
   auto* agents = new Agent[numOfAgents];
   for (int i = 0; i < numOfAgents; ++i)
   {
     Vector2D pos, vel;
     std::cin >> pos.x >> pos.y >> vel.x >> vel.y;
     agents[i] = Agent(pos, vel);
-
-    //std::cout << std::fixed << std::setprecision(3)<< agents[i].getPos().x << " " << agents[i].getPos().y << " " << agents[i].getVel().x << " " << agents[i].getVel().y << std::endl;
   }
 
+  //Game Loop
   while (std::cin >> deltaTime)
   {
     for (int i = 0; i < numOfAgents; i++)
@@ -174,5 +177,6 @@ int main()
     }
   }
 
+  //Clean Up
   delete[] agents;
 }
