@@ -52,6 +52,7 @@ struct Vector2D
 class Agent
 {
 public:
+
   explicit Agent(Vector2D position = Vector2D(), Vector2D velocity = Vector2D())
   {
     m_position = position;
@@ -119,6 +120,7 @@ public:
   }
 
 private:
+
   void calculateNeighbors(double radius, Agent agents[], int numOfAgents, bool includeSelf)
   {
     m_neighborhood.clear();
