@@ -15,48 +15,60 @@ void switchValues(Cell **cells, int n, int m)
     }
 }
 
-bool isValidPos(int i, int j, int n, int m)
+std::pair<int, int> wrapAround(int n, int m,int i, int j)
 {
-  if (i < 0 || j < 0 || i > n - 1 || j > m - 1)
-    return false;
+  if(i < 0)
+    i = n;
 
-  return true;
+  if(j < 0)
+    j = m;
+
+  if(i > n)
+    i = 0;
+
+  if(j > m)
+    j = 0;
+
+  return std::make_pair(i, j);
 }
 
 int getNumOfAliveNeighbors(Cell **cells, int n, int m, int i, int j)
 {
   int num = 0;
+  std::pair<int, int> testCords;
+  n -= 1;
+  m -= 1;
 
-  if (isValidPos(i - 1, j - 1, n, m))
-    if(cells[i - 1][j - 1].alive) num++;
+  testCords = wrapAround(n, m, i - 1, j - 1);
+  if(cells[testCords.first][testCords.second].alive) num++;
 
-  if (isValidPos(i - 1, j, n, m))
-    if(cells[i - 1][j].alive) num++;
+  testCords = wrapAround(n, m, i - 1, j);
+  if(cells[testCords.first][testCords.second].alive) num++;
 
-  if (isValidPos(i - 1, j + 1, n, m))
-    if(cells[i - 1][j + 1].alive) num++;
+  testCords = wrapAround(n, m, i - 1, j + 1);
+  if(cells[testCords.first][testCords.second].alive) num++;
 
-  if (isValidPos(i, j - 1, n, m))
-    if(cells[i][j - 1].alive) num++;
+  testCords = wrapAround(n, m, i, j - 1);
+  if(cells[testCords.first][testCords.second].alive) num++;
 
-  if (isValidPos(i, j + 1, n, m))
-    if(cells[i][j + 1].alive) num++;
+  testCords = wrapAround(n, m, i, j + 1);
+  if(cells[testCords.first][testCords.second].alive) num++;
 
-  if (isValidPos(i + 1, j - 1, n, m))
-    if(cells[i + 1][j - 1].alive) num++;
+  testCords = wrapAround(n, m, i + 1, j - 1);
+  if(cells[testCords.first][testCords.second].alive) num++;
 
-  if (isValidPos(i + 1, j, n, m))
-    if(cells[i + 1][j].alive) num++;
+  testCords = wrapAround(n, m, i + 1, j);
+  if(cells[testCords.first][testCords.second].alive) num++;
 
-  if (isValidPos(i + 1, j + 1, n, m))
-    if(cells[i + 1][j + 1].alive) num++;
+  testCords = wrapAround(n, m, i + 1, j + 1);
+  if(cells[testCords.first][testCords.second].alive) num++;
 
   return num;
 }
 
 void output(Cell **cells, int columns, int rows)
 {
-  std::cout << std::endl;
+  //std::cout << std::endl;
   for (int i = 0; i < columns; i++) {
     for (int j = 0; j < rows; j++) {
       if (cells[i][j].alive)
@@ -72,7 +84,7 @@ void output(Cell **cells, int columns, int rows)
 int main()
 {
   int columns, rows, turns;
-  std::cin >> columns >> rows >> turns;
+  std::cin >> rows >> columns >> turns;
 
   //Make 2D Array
   Cell** cells = new Cell*[columns];
@@ -115,10 +127,10 @@ int main()
       }
 
     switchValues(cells, columns, rows);
-    output(cells, columns, rows);
+    //output(cells, columns, rows);
   }
 
-  //output(cells, columns, rows);
+  output(cells, columns, rows);
 
   return 0;
 };
