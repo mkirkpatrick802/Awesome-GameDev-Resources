@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <stack>
 using namespace std;
 
 struct Node
@@ -13,8 +14,8 @@ struct Node
     Walls.second = true;
   }
 
-  int X;
-  int Y;
+  int X, Y;
+  bool Visited = false;
   pair<bool, bool> Walls;
 };
 
@@ -39,19 +40,32 @@ int main()
   }
 
   //Depth First Search
-  vector<Node*> Stack;
-  Stack.push_back(NodeList[0][0]);
+  stack<Node*> Stack;
+  Stack.push(NodeList[0][0]);
   while(!Stack.empty())
   {
-    Node* CurrentNode = Stack.front();
+    Node* CurrentNode = Stack.top();
+    CurrentNode->Visited = true;
+
     vector<Node*> NeighborList;
     if(CheckForNeighbors(CurrentNode, NeighborList, NodeList, Rows, Columns))
     {
+      int NumOfNeighbors = int(NeighborList.size());
+      int TargetIndex = Random[Seed] % NumOfNeighbors;
+      Seed++;
+      if(Seed > RandomLength)
+        Seed = 0;
 
+      Node* Target = NeighborList[TargetIndex];
+      
+      //TODO: Delete Walls
+
+
+      Stack.push(Target);
     }
     else
     {
-      Stack.erase(Stack.begin());
+      Stack.pop();
     }
   }
 
@@ -99,9 +113,58 @@ int main()
   }
 }
 
-bool CheckForNeighbors(Node* CurrentNode, vector<Node*>& NeighborList, const vector<vector<Node*>>& NodeList, int Rows, int Columns)
+//Check the adjacent neighbors
+bool CheckForNeighbors(Node* CurrentNode, vector<Node*>& NeighborList, const vector<vector<Node*>>& NodeList, int MaxRows, int MaxColumns)
 {
+  int checks = 0;
 
+  //Test Up
+  if(CurrentNode->Y - 1 >= 0)
+  {
+    Node* TopNode = NodeList[CurrentNode->Y - 1][CurrentNode->X];
+    if(!TopNode->Visited)
+    {
+      NeighborList.push_back(TopNode);
+      checks++;
+    }
+  }
+
+  //Test Right
+  if(CurrentNode->X + 1 < MaxColumns)
+  {
+    Node* RightNode = NodeList[CurrentNode->Y][CurrentNode->X + 1];
+    if(!RightNode->Visited)
+    {
+      NeighborList.push_back(RightNode);
+      checks++;
+    }
+  }
+
+  //Test Down
+  if(CurrentNode->Y + 1 < MaxRows)
+  {
+    Node* BottomNode = NodeList[CurrentNode->Y + 1][CurrentNode->X];
+    if(!BottomNode->Visited)
+    {
+      NeighborList.push_back(BottomNode);
+      checks++;
+    }
+  }
+
+  //Test Left
+  if(CurrentNode->X - 1 >= 0)
+  {
+    Node* LeftNode = NodeList[CurrentNode->Y][CurrentNode->X - 1];
+    if(!LeftNode->Visited)
+    {
+      NeighborList.push_back(LeftNode);
+      checks++;
+    }
+  }
+
+  if(checks == 0) return false;
+
+  return true;
 }
 
 
