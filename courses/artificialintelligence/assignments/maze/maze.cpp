@@ -60,7 +60,7 @@ int main()
       {
         int TargetIndex = Random[Seed] % NumOfNeighbors;
         Seed++;
-        if(Seed > RandomLength)
+        if(Seed >= RandomLength)
           Seed = 0;
 
         TargetNode = NeighborList[TargetIndex];
