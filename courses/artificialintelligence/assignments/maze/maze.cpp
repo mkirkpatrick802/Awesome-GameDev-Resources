@@ -51,17 +51,27 @@ int main()
     if(CheckForNeighbors(CurrentNode, NeighborList, NodeList, Rows, Columns))
     {
       int NumOfNeighbors = int(NeighborList.size());
-      int TargetIndex = Random[Seed] % NumOfNeighbors;
-      Seed++;
-      if(Seed > RandomLength)
-        Seed = 0;
+      Node* TargetNode = nullptr;
+      if(NumOfNeighbors == 1)
+      {
+        TargetNode = NeighborList.front();
+      }
+      else
+      {
+        int TargetIndex = Random[Seed] % NumOfNeighbors;
+        Seed++;
+        if(Seed > RandomLength)
+          Seed = 0;
 
-      Node* Target = NeighborList[TargetIndex];
-      
-      //TODO: Delete Walls
+        TargetNode = NeighborList[TargetIndex];
+      }
 
+      if(TargetNode->Y < CurrentNode->Y) CurrentNode->Walls.second = false;
+      else if(TargetNode->X > CurrentNode->X) TargetNode->Walls.first = false;
+      else if(TargetNode->Y > CurrentNode->Y) TargetNode->Walls.second = false;
+      else if(TargetNode->X < CurrentNode->X) CurrentNode->Walls.first = false;
 
-      Stack.push(Target);
+      Stack.push(TargetNode);
     }
     else
     {
@@ -83,7 +93,7 @@ int main()
   {
     for(int j = 0; j < Columns; ++j)
     {
-      if(NodeList[i][j]->Walls.second)
+      if(NodeList[i][j]->Walls.first)
       {
         cout << "|";
       }
@@ -94,7 +104,7 @@ int main()
 
       if(i+1 < Rows)
       {
-        if(NodeList[i+1][j]->Walls.first)
+        if(NodeList[i+1][j]->Walls.second)
         {
           cout << "_";
         }
@@ -109,7 +119,7 @@ int main()
       }
     }
 
-    cout << "|" << endl;
+    cout << "| " << endl;
   }
 }
 
