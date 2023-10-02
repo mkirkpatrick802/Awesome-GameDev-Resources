@@ -132,5 +132,13 @@ int main()
 
   output(cells, columns, rows);
 
+  //Clean Up
+  //Free each sub-array
+  for(int i = 0; i < columns; i++) {
+    delete[] cells[i];
+  }
+
+  delete[] cells;
+
   return 0;
 };
