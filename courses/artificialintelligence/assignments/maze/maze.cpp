@@ -121,6 +121,15 @@ int main()
 
     cout << "| " << endl;
   }
+
+  //Clean Up
+  for (int i = 0; i < Rows; ++i)
+  {
+    for (int j = 0; j < Columns; ++j)
+    {
+      delete NodeList[i][j];
+    }
+  }
 }
 
 //Check the adjacent neighbors
