@@ -61,16 +61,22 @@ int main()
   std::cin >> turn >> sideSize >> catX >> catY;
   blocked = readBoard(sideSize);
 
-  //while(true)
+  while(true)
   {
     if(turn == "CAT")
     {
       Cat cat;
       auto catMove = cat.move(blocked, {catX, catY}, sideSize);
-      if(cat.hasWon || cat.isStuck) //break;
+
+      if(cat.isStuck) break;
+      catX = catMove.first;
+      catY = catMove.second;
 
       turn = "CATCHER";
       print(blocked, sideSize, {catMove.first, catMove.second}, turn);
+
+      if(catMove.first == sideSize / 2 * -1 || catMove.first == sideSize / 2 || catMove.second == sideSize / 2 * -1 || catMove.second == sideSize / 2) break;
+
     }
     else if (turn == "CATCHER")
     {
